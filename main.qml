@@ -74,7 +74,7 @@ Window {
                 }
 
                 function scrollToBottom() {
-                    ScrollBar.vertical.position = (contentHeight - height) / contentHeight
+                    ScrollBar.vertical.position = Math.max(0, (contentHeight - height) / contentHeight)
                 }
             }
 
