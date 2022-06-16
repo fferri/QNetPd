@@ -265,7 +265,8 @@ Window {
         }
         if(addrv[0] === 'chat') {
             if(addrv[1] === 'msg') {
-                appendTextLine(args[0] + ": \t" + args[1])
+                var timeStr = Qt.formatTime(new Date(), 'h:mm:ss');
+                appendTextLine(timeStr + "  " + args[0] + ": \t" + args[1])
             }
             if(addrv[1] === 'listrequest') {
                 sendMessage(`/${args[0]}/chat/msg`, [nicknameField.text, `▬▬▬ client-ID: ${root.socketNumber} / ${root.title}`, root.socketNumber])
