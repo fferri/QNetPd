@@ -135,6 +135,7 @@ void OSC::onReadyRead()
         char c = data.at(i);
         if(escape_)
         {
+            escape_ = false;
             if(c == ESC_END)
                 buf_.append(END);
             else if(c == ESC_ESC)
