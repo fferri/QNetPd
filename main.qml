@@ -60,21 +60,43 @@ Window {
                 }
             }
 
-            ScrollView {
-                id: scrollView
+            ListView {
+                id: listView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                model: ListModel {id: listModel}
+                delegate: Rectangle {
+                    width: listView.width
+                    implicitHeight: messageCell.implicitHeight
+                    color: Qt.rgba(0, 0, 0, index % 2 ? 0.02 : 0)
 
-                TextArea {
-                    id: textArea
-                    readOnly: true
-                    selectByMouse: true
-                    textFormat: TextEdit.RichText
-                    onLinkActivated: (link) => Qt.openUrlExternally(link)
-                }
+                    Row {
+                        anchors.fill: parent
+                        spacing: 10
 
-                function scrollToBottom() {
-                    ScrollBar.vertical.position = Math.max(0, (contentHeight - height) / contentHeight)
+                        Text {
+                            id: timeCell
+                            width: 50
+                            text: time
+                            color: '#ccc'
+                        }
+
+                        Text {
+                            id: nicknameCell
+                            width: 100
+                            text: nickname
+                            font.bold: true
+                            horizontalAlignment: Qt.AlignRight
+                        }
+
+                        Text {
+                            id: messageCell
+                            width: listView.width - 20 - timeCell.width - nicknameCell.width
+                            text: message
+                            onLinkActivated: (link) => Qt.openUrlExternally(link)
+                            wrapMode: Text.Wrap
+                        }
+                    }
                 }
             }
 
@@ -196,11 +218,12 @@ Window {
         return txt
     }
 
-    function appendTextLine(txt) {
-        txt = escapeHTML(txt)
-        txt = linkify(txt)
-        textArea.text += `${txt}\n`
-        scrollView.scrollToBottom()
+    function appendTextLine(message, time, nickname) {
+        message = escapeHTML(message)
+        message = linkify(message)
+        nickname = escapeHTML(nickname)
+        listModel.append({time, nickname, message})
+        listView.positionViewAtEnd()
     }
 
     function connectClicked() {
@@ -265,8 +288,7 @@ Window {
         }
         if(addrv[0] === 'chat') {
             if(addrv[1] === 'msg') {
-                var timeStr = Qt.formatTime(new Date(), 'h:mm:ss');
-                appendTextLine(timeStr + "  " + args[0] + ": \t" + args[1])
+                appendTextLine(args[1], Qt.formatTime(new Date(), 'h:mm:ss'), args[0])
             }
             if(addrv[1] === 'listrequest') {
                 sendMessage(`/${args[0]}/chat/msg`, [nicknameField.text, `▬▬▬ client-ID: ${root.socketNumber} / ${root.title}`, root.socketNumber])
